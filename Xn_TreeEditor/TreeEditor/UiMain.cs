@@ -219,7 +219,10 @@ namespace TreeEditor
             //━━━━━
             {
                 string filePath = @"save\" + this.ProjectName + @"\node\食べ物.txt";
-                Actions.LoadText((Form1)this.ParentForm, filePath);
+                if (this.ParentForm is Form1)//ビジュアルエディターでは、親フォームがForm1とは限らない。
+                {                    
+                    Actions.LoadText((Form1)this.ParentForm, filePath);
+                }
             }
 
             //━━━━━
@@ -252,7 +255,7 @@ namespace TreeEditor
             sb.Append(this.ProjectName);
 
             //アプリケーション名
-            sb.Append(" / ツールエディター");
+            sb.Append(" / ツリーエディター");
             if(this.IsChangedText)
             {
                 sb.Append(" *");
@@ -580,18 +583,63 @@ namespace TreeEditor
 
             if (ht.Location == TreeViewHitTestLocations.Label)
             {
-                //━━━━━
-                //ノード名読込
-                //━━━━━
-                this.uiTextside1.ToolStripTextBox1.Text = ht.Node.Text;
+                bool isSave = false;
+                bool isLoad = false;
+
+                if (this.IsChangedText)
+                {
+                    DialogResult result = MessageBox.Show(
+                        "変更内容を保存しますか？",
+                        "ファイル変更",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Exclamation
+                        );
+                    switch (result)
+                    {
+                        case DialogResult.Yes:
+                            isSave = true;
+                            isLoad = true;
+                            break;
+                        case DialogResult.No:
+                            isLoad = true;
+                            break;
+                        default:
+                            // キャンセル
+                            break;
+                    }
+
+                    // メッセージボックスを出すと選択されないので、再選択します。
+                    this.treeView1.SelectedNode = ht.Node;
+                }
+                else
+                {
+                    isLoad = true;
+                }
 
 
-                //━━━━━
-                //テキストファイル読込
-                //━━━━━
-                string filePath = @"save\" + this.ProjectName + @"\node\" + ht.Node.Text + @".txt";
-                Actions.LoadText((Form1)this.ParentForm,filePath);
+                if (isSave)
+                {
+                    Actions.SaveText((Form1)this.ParentForm);
+                }
+
+
+                if (isLoad)
+                {
+                    //━━━━━
+                    //ノード名読込
+                    //━━━━━
+                    this.uiTextside1.ToolStripTextBox1.Text = ht.Node.Text;
+
+
+                    //━━━━━
+                    //テキストファイル読込
+                    //━━━━━
+                    string filePath = @"save\" + this.ProjectName + @"\node\" + ht.Node.Text + @".txt";
+                    Actions.LoadText((Form1)this.ParentForm, filePath);
+                }
             }
+
+
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)

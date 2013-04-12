@@ -56,6 +56,7 @@
             this.最近使ったファイルToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.編集ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.エディットを元に戻すToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.エディットを元に戻すのをやり直すToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.直前の場所に戻るToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -146,7 +147,6 @@
             this.目次ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator21 = new System.Windows.Forms.ToolStripSeparator();
             this.バージョン情報ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.エディットを元に戻すのをやり直すToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uiMain1 = new TreeEditor.UiMain();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -374,6 +374,13 @@
             this.エディットを元に戻すToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
             this.エディットを元に戻すToolStripMenuItem.Text = "エディットを元に戻す";
             this.エディットを元に戻すToolStripMenuItem.Click += new System.EventHandler(this.エディットを元に戻すToolStripMenuItem_Click);
+            // 
+            // エディットを元に戻すのをやり直すToolStripMenuItem
+            // 
+            this.エディットを元に戻すのをやり直すToolStripMenuItem.Name = "エディットを元に戻すのをやり直すToolStripMenuItem";
+            this.エディットを元に戻すのをやり直すToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
+            this.エディットを元に戻すのをやり直すToolStripMenuItem.Text = "エディットを元に戻すのをやり直す";
+            this.エディットを元に戻すのをやり直すToolStripMenuItem.Click += new System.EventHandler(this.エディットを元に戻すのをやり直すToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -972,16 +979,12 @@
             this.バージョン情報ToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.バージョン情報ToolStripMenuItem.Text = "バージョン情報";
             // 
-            // エディットを元に戻すのをやり直すToolStripMenuItem
-            // 
-            this.エディットを元に戻すのをやり直すToolStripMenuItem.Name = "エディットを元に戻すのをやり直すToolStripMenuItem";
-            this.エディットを元に戻すのをやり直すToolStripMenuItem.Size = new System.Drawing.Size(226, 22);
-            this.エディットを元に戻すのをやり直すToolStripMenuItem.Text = "エディットを元に戻すのをやり直す";
-            this.エディットを元に戻すのをやり直すToolStripMenuItem.Click += new System.EventHandler(this.エディットを元に戻すのをやり直すToolStripMenuItem_Click);
-            // 
             // uiMain1
             // 
             this.uiMain1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.uiMain1.FilePath = null;
+            this.uiMain1.FileText = null;
+            this.uiMain1.IsChangedText = false;
             this.uiMain1.Location = new System.Drawing.Point(0, 22);
             this.uiMain1.Name = "uiMain1";
             this.uiMain1.ProjectName = "default";
@@ -995,10 +998,12 @@
             this.ClientSize = new System.Drawing.Size(860, 476);
             this.Controls.Add(this.uiMain1);
             this.Controls.Add(this.menuStrip1);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "ツリーエディター";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

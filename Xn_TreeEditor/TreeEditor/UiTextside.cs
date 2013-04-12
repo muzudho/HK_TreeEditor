@@ -12,6 +12,32 @@ namespace TreeEditor
 {
     public partial class UiTextside : UserControl
     {
+
+
+        /// <summary>
+        /// ドラッグしているピクチャーボックス。なければヌル。
+        /// </summary>
+        private PictureBox draggingPictureBox;
+        public PictureBox DraggingPictureBox
+        {
+            get
+            {
+                return draggingPictureBox;
+            }
+            set
+            {
+                draggingPictureBox = value;
+            }
+        }
+
+
+        /// <summary>
+        /// マウスボタンが押されたときの、コントロール内でのマウス押下座標。
+        /// </summary>
+        private Point mouseDownOffsetLocation = Point.Empty;
+
+
+
         /// <summary>
         /// テキストの丸ごと履歴。
         /// </summary>
@@ -89,6 +115,13 @@ namespace TreeEditor
         private void UiTextside_Load(object sender, EventArgs e)
         {
             this.FitSize();
+
+
+            //━━━━━
+            // ドラッグ＆ドロップ
+            //━━━━━
+            this.richTextBox1.AllowDrop = true;
+
 
             //━━━━━
             // フォント・ファミリー
@@ -179,6 +212,235 @@ namespace TreeEditor
             //System.Console.WriteLine(this.richTextBox1.Text);
 
             uiMain.RefreshTitleBar();
+        }
+
+        private void richTextBox1_DragEnter(object sender, DragEventArgs e)
+        {
+            // ドラッグされてきたデータの形式を一覧します。
+            StringBuilder sb = new StringBuilder();
+            sb.Append("ドラッグされてきたデータの形式の個数=[");
+            sb.Append(e.Data.GetFormats().Length);
+            sb.Append("]\r\n");
+            foreach (string format in e.Data.GetFormats())
+            {
+                sb.Append(format);
+                sb.Append("\r\n");
+            }
+            System.Console.WriteLine( sb.ToString());
+
+            // ドラッグされてきたデータの形式を調べます。
+
+            // ファイルドロップ
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                System.Console.WriteLine("ファイル名のようなものがパネルの上にドラッグされてきています。");
+
+                // ドロップした時の効果を Copy として見えるようにします。
+                e.Effect = DragDropEffects.Copy;
+                System.Console.WriteLine("コピーの受け入れ態勢をとります。");
+            }
+            // URL
+            else if (
+                e.Data.GetDataPresent("UniformResourceLocator") ||
+                e.Data.GetDataPresent("UniformResourceLocatorW")
+                )
+            {
+                System.Console.WriteLine("URLのようなものがパネルの上にドラッグされてきています。");
+
+                // URLであれば、ドロップした時の効果を Copy として見えるようにします。
+                e.Effect = DragDropEffects.Copy;
+                System.Console.WriteLine("コピーの受け入れ態勢をとります。");
+            }
+            // 文字列
+            else if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            {
+                System.Console.WriteLine("文字列のようなものがパネルの上にドラッグされてきています。");
+
+                // 文字列であれば、ドロップした時の効果を Copy として見えるようにします。
+                e.Effect = DragDropEffects.None;
+                System.Console.WriteLine("受け入れない態勢をとります。");
+            }
+            else
+            {
+                System.Console.WriteLine("何かがパネルの上にドラッグされてきています。");
+
+                // 文字列でも画像でもなければ、ドロップできないように見えるようにします。
+                e.Effect = DragDropEffects.None;
+                System.Console.WriteLine("受け入れない態勢をとります。");
+            }
+        }
+
+        private void richTextBox1_DragDrop(object sender, DragEventArgs e)
+        {
+
+            // ドロップされたデータの形式を一覧します。
+            StringBuilder text = new StringBuilder();
+            text.Append("ドロップされたデータの形式の個数=[");
+            text.Append(e.Data.GetFormats().Length);
+            text.Append("]\r\n");
+            foreach (string format in e.Data.GetFormats())
+            {
+                text.Append(format);
+                text.Append("\r\n");
+            }
+            System.Console.WriteLine(text.ToString());
+
+            //ドロップされたデータの形式を調べます。
+
+            // ファイルドロップ
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                // ファイルであれば。
+                string[] fileNames = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+
+                // ドロップされたファイル名を一覧します。
+                StringBuilder fileNamesText = new StringBuilder();
+                fileNamesText.Append("ドロップされたファイル名の個数=[");
+                fileNamesText.Append(fileNames.Length);
+                fileNamesText.Append("]\r\n");
+
+                foreach (string fileName in fileNames)
+                {
+                    Bitmap droppedBitmap = null;
+                    try
+                    {
+                        // ファイル名が画像を指していれば画像に、
+                        // そうでなければ例外を返します。
+                        droppedBitmap = new Bitmap(fileName);
+                        System.Console.WriteLine("droppedBitmap:" + droppedBitmap.ToString());
+
+                        Point p2 = this.richTextBox1.PointToClient(new Point(e.X, e.Y));
+
+                        PictureBox pic1 = new PictureBox();
+                        pic1.Visible = true;
+                        pic1.Image = droppedBitmap;
+                        pic1.Location = new Point(p2.X - droppedBitmap.Width / 2, p2.Y - droppedBitmap.Height / 2);
+                        pic1.Size = new Size(droppedBitmap.Width, droppedBitmap.Height);
+                        pic1.MouseMove += pic1_MouseMove;
+                        pic1.MouseDown += pic1_MouseDown;
+                        pic1.MouseUp += pic1_MouseUp;
+
+                        this.richTextBox1.SuspendLayout();
+                        this.richTextBox1.Controls.Add(pic1);
+                        this.richTextBox1.ResumeLayout();
+                        this.richTextBox1.Refresh();
+                        this.Refresh();
+
+                        foreach (Control c in this.richTextBox1.Controls)
+                        {
+                            System.Console.WriteLine("コントロール："+c.ToString());
+                            if (c is PictureBox)
+                            {
+                                PictureBox p = (PictureBox)c;
+
+                                System.Console.WriteLine("コントロール： 座標(" + p.Location.X + "," + p.Location.Y + ") サイズ("+ p.Width + "," + p.Height +")");
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // 画像ではなかった場合。
+
+                        // 無視します。
+                    }
+
+                    // ファイル名を取得していきます。
+                    fileNamesText.Append(fileName);
+                    fileNamesText.Append("\r\n");
+                }
+                System.Console.WriteLine("fileNamesText.ToString():" +  fileNamesText.ToString());
+                System.Console.WriteLine("ファイル名のようなものがパネルの上に落とされました。");
+            }
+            // URL
+            else if (
+                e.Data.GetDataPresent("UniformResourceLocator") ||
+                e.Data.GetDataPresent("UniformResourceLocatorW")
+                )
+            {
+                // 現在、プログラムの処理は　このコードまで到達しません。
+
+                MessageBox.Show(e.Data.GetData("UniformResourceLocator").ToString(), "URI");
+
+                // URLとして読み取れる形式のデータがドロップされた場合、
+                // テキストボックスに、そのURLを表示します。
+                string droppedUri = e.Data.GetData("UniformResourceLocator").ToString();
+                if ("" == droppedUri)
+                {
+                    droppedUri = e.Data.GetData("UniformResourceLocatorW").ToString();
+                }
+
+                System.Console.WriteLine("droppedUri:" + droppedUri);
+                System.Console.WriteLine("URLがパネルの上に落とされました。");
+            }
+            // 文字列
+            else if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            {
+                // 文字列として読み取れる形式のデータがドロップされた場合、
+                // テキストボックスに、その文字列データを表示します。
+                string droppedText = (string)e.Data.GetData(typeof(string));
+
+                System.Console.WriteLine("droppedText:" + droppedText);
+                System.Console.WriteLine("文字列がパネルの上に落とされました。");
+            }
+            else
+            {
+                System.Console.WriteLine("何かパネルの上に落とされましたが、文字列としても画像としても読み取れませんでした。");
+            }
+            // 文字列または画像のどちらにも読み取れないデータは無視します。
+
+        }
+
+        void pic1_MouseUp(object sender, MouseEventArgs e)
+        {
+            System.Console.WriteLine("★pic1_MouseUp");
+
+            if (null != this.DraggingPictureBox)
+            {
+                this.DraggingPictureBox.BorderStyle = BorderStyle.None;
+                this.DraggingPictureBox = null;
+            }
+        }
+
+        void pic1_MouseDown(object sender, MouseEventArgs e)
+        {
+            System.Console.WriteLine("★pic1_MouseDown");
+
+            this.DraggingPictureBox = (PictureBox)sender;
+            this.DraggingPictureBox.BorderStyle = BorderStyle.FixedSingle;
+
+            // ピクチャーボックス内での、マウスボタン押下座標。
+            System.Console.WriteLine("e.Location=(" + e.Location.X + "、" + e.Location.Y + ")");
+            this.mouseDownOffsetLocation = new Point(e.Location.X, e.Location.Y);
+        }
+
+        void pic1_MouseMove(object sender, MouseEventArgs e)
+        {
+            //System.Console.WriteLine("★pic1_MouseMove");
+
+            if (null != this.DraggingPictureBox)
+            {
+                // マウス移動量。
+                Point mv = new Point(
+                        e.X - this.mouseDownOffsetLocation.X,
+                        e.Y - this.mouseDownOffsetLocation.Y
+                    );
+
+                // リッチテキストエリア内での、ピクチャーボックスの左上座標
+                this.DraggingPictureBox.Location = new Point(
+                    this.DraggingPictureBox.Location.X + mv.X,
+                    this.DraggingPictureBox.Location.Y + mv.Y
+                    );
+                this.DraggingPictureBox.Refresh();
+            }
+        }
+
+        private void richTextBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (null!=this.DraggingPictureBox)
+            {
+                this.DraggingPictureBox.BorderStyle = BorderStyle.None;
+                this.DraggingPictureBox = null;
+            }
         }
     }
 }

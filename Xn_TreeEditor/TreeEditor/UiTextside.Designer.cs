@@ -61,10 +61,14 @@
             this.richTextBox1.Size = new System.Drawing.Size(668, 365);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
+            this.richTextBox1.DragDrop += new System.Windows.Forms.DragEventHandler(this.richTextBox1_DragDrop);
+            this.richTextBox1.DragEnter += new System.Windows.Forms.DragEventHandler(this.richTextBox1_DragEnter);
             this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
+            this.richTextBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseUp);
             // 
             // toolStripContainer1
             // 
+            this.toolStripContainer1.AllowDrop = true;
             this.toolStripContainer1.BottomToolStripPanelVisible = false;
             // 
             // toolStripContainer1.ContentPanel
@@ -229,6 +233,7 @@
             // 
             // UiTextside
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;

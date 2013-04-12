@@ -61,5 +61,26 @@ namespace TreeEditor
         {
             Actions.Redo(this);
         }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+
+            if (e.Control && Keys.S == e.KeyCode)
+            {
+                System.Console.WriteLine("セーブしたい。");
+                Actions.SaveText(this);
+            }
+            else if (e.Control && Keys.Z == e.KeyCode)
+            {
+                System.Console.WriteLine("アンドゥしたい。");
+                Actions.Undo(this);
+            }
+            else if (e.Control && Keys.Y == e.KeyCode)
+            {
+                System.Console.WriteLine("リドゥしたい。");
+                Actions.Redo(this);
+            }
+
+        }
     }
 }
