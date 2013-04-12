@@ -8,13 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+using Xenon.Syntax;
+
+namespace TreeEditor
 {
     public partial class Form1 : Form
     {
         public Form1()
         {
             InitializeComponent();
+            Xenon.Syntax.Log_ReportsImpl.BDebugmode_Form = true;
+            Xenon.Syntax.Log_ReportsImpl.BDebugmode_Static = true;
         }
 
 
@@ -33,6 +37,29 @@ namespace WindowsFormsApplication1
         private void Form1_Resize(object sender, EventArgs e)
         {
             this.FitSize();
+        }
+
+        private void 新規作成ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Actions.New(this);
+        }
+
+        public UiMain UiMain1
+        {
+            get
+            {
+                return this.uiMain1;
+            }
+        }
+
+        private void エディットを元に戻すToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Actions.Undo(this);
+        }
+
+        private void エディットを元に戻すのをやり直すToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Actions.Redo(this);
         }
     }
 }

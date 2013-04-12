@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace TreeEditor
 {
     partial class UiTextside
     {
@@ -61,6 +61,7 @@
             this.richTextBox1.Size = new System.Drawing.Size(668, 365);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
+            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
             // 
             // toolStripContainer1
             // 
@@ -90,9 +91,9 @@
             this.toolStrip2.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripTextBox1});
-            this.toolStrip2.Location = new System.Drawing.Point(3, 0);
+            this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(445, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(674, 25);
             this.toolStrip2.Stretch = true;
             this.toolStrip2.TabIndex = 0;
             this.toolStrip2.Resize += new System.EventHandler(this.toolStrip2_Resize);
